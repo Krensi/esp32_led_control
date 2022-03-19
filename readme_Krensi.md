@@ -41,3 +41,8 @@ endif()
 ``
 -G Ninja -DPYTHON_DEPS_CHECKED=1 -DESP_PLATFORM=1 -DIDF_TARGET=esp32s2 -DCCACHE_ENABLE=1
 ``
+
+## Open OCD flashing
+```
+-s C:\Users\ckrenslehner\.espressif\tools\openocd-esp32\v0.11.0-esp32-20211220\openocd-esp32\share\openocd\scripts -f C:\Users\ckrenslehner\Documents\CK\Projects\ESP\startup_time\openocd\board_ft232h_esp32s2.cfg -c "program_esp C:/Users/ckrenslehner/Documents/CK/Projects/ESP/startup_time/cmake-build-debug-mingw/startup_time.bin 0x10000 verify reset exit"
+```
