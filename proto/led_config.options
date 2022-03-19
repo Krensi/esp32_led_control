@@ -1,0 +1,5 @@
+ledconfig.LedConfig.Segment.Standard.color_list max_count:10
+ledconfig.LedConfig.Segment.KnightRider.color_list max_count:10
+ledconfig.LedConfig.Segment.ColorWave.color_list max_count:10
+
+ledconfig.LedConfig.segments max_count:10

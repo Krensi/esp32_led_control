@@ -1,0 +1,75 @@
+syntax="proto2";
+package ledconfig;
+
+
+/**
+* Standard (immer ganzes Segment -> index start + end) -> Farbe + Helligkeit -> RGB
+*
+* Farbe als Liste (RGB + Zeit + Übergang)? 
+*
+* Special Modes (immer ganzes Segment -> index start + end):
+* - Color Pulsating -> Farbe + Frequenz + high ; low -> Von hell zu dunkel zu hell mit Gradient
+* - Knight Rider -> Farbe + Frequenz + Knight Rider Pulse Width (nof LEDs)
+* - Color Wave -> Farbe + Frequenz + Anzahl + width
+*/
+message LedConfig
+{
+    message Color
+    {
+        enum SwitchingMode
+        {
+            JUMP = 1;
+            LINEAR_FADE = 2;
+            SMOOTH_FADE = 3;
+        }
+    
+        required uint32 value_red = 1;
+        required uint32 value_green = 2;
+        required uint32 value_blue = 3;
+    
+        optional uint32 time_active_ms = 4 [default = 1000];
+        optional SwitchingMode switching_mode = 5;
+    }
+
+    message Segment
+    {
+        enum SegmentMode
+        {
+            STANDARD = 1;
+            KNIGHT_RIDER = 2;
+            COLOR_WAVE = 3;
+        }
+
+        message Standard
+        {
+            repeated Color color_list = 1;
+        }
+
+        message KnightRider
+        {
+            repeated Color color_list = 1;
+            optional uint32 pulse_width = 2; // Number of LEDS of the Pulse
+            optional float speed = 3; // Speed in m/s
+        }
+
+        message ColorWave
+        {
+            repeated Color color_list = 1;
+            optional uint32 pulse_width = 2; // Number of LEDS of the Pulse
+            optional float speed = 3; // Speed in m/s
+        }
+    
+        required uint32 index_led_start = 1;
+        required uint32 index_led_end = 2;
+
+        oneof mode 
+        {
+            Standard standard = 3;
+            KnightRider knight_rider = 4;
+            ColorWave color_wave = 5;
+        }
+    }
+
+    repeated Segment segments = 1;
+}
+
