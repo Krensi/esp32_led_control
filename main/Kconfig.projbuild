@@ -1,13 +1,7 @@
 menu "Example Configuration"
-    config EXAMPLE_RMT_TX_GPIO
-        int "RMT TX GPIO"
-        default 18
-        help
-            Set the GPIO number used for transmitting the RMT signal.
 
-    config EXAMPLE_STRIP_LED_NUMBER
-        int "Number of LEDS in a strip"
-        default 10
-        help
-            A single RGB strip contains several LEDs.
+    config EXAMPLE_DUMP_ADV_DATA_AND_SCAN_RESP
+        bool "Dump whole adv data and scan response data in example"
+        default n
+
 endmenu
