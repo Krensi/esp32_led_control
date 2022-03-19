@@ -1,63 +1,52 @@
-# Startup Time Example
+# RMT Transmit Example -- LED Strip
 
 (See the README.md file in the upper level 'examples' directory for more information about examples.)
 
-This example demonstrates the configuration settings to obtain the minimum possible startup time for an ESP-IDF application (i.e. time from initial reset until the `app_main()` function is running).
+Although RMT peripheral is mainly designed for infrared remote applications, it can also support other generic protocols thanks to its flexible data format. [WS2812](http://www.world-semi.com/Certifications/WS2812B.html) is a digital RGB LED which integrates a driver circuit and a single control wire. The protocol data format defined in WS2812 is compatible to that in RMT peripheral. This example will illustrate how to drive an WS2812 LED strip based on the RMT driver.
 
-Note that some of the configuration settings in `sdkconfig.defaults` have trade-offs that may not be suitable for your project, see the "Applying To Your Own Project" section at the bottom for more details.
-
-## How to use example
+## How to Use Example
 
 ### Hardware Required
 
-This example should be able to run on any commonly available ESP32 development board.
+* A development board with ESP32 SoC (e.g., ESP32-DevKitC, ESP-WROVER-KIT, etc.)
+* A USB cable for Power supply and programming
+* A WS2812 LED strip
 
-### Configure the project
-
-This step is optional, the default settings in `sdkconfig.defaults` are already set to minimize startup time.
+Connection :
 
 ```
-idf.py menuconfig
+                             --- 5V
+                              |
+                              +
+GPIO18 +-----------------+---|>| (WS2812)
+                        DI    +
+                              |
+                             --- GND
 ```
+
+### Configure the Project
+
+Open the project configuration menu (`idf.py menuconfig`). 
+
+In the `Example Configuration` menu:
+
+* Set the GPIO number used for transmitting the IR signal under `RMT TX GPIO` option.
+* Set the number of LEDs in a strip under `Number of LEDS in a strip` option.
 
 ### Build and Flash
 
-Build the project and flash it to the board, then run monitor tool to view serial output:
-
-```
-idf.py -p PORT flash monitor
-```
-
-(Replace PORT with the name of the serial port to use.)
+Run `idf.py -p PORT flash monitor` to build, flash and monitor the project.
 
 (To exit the serial monitor, type ``Ctrl-]``.)
 
-See the Getting Started Guide for full steps to configure and use ESP-IDF to build projects.
+See the [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/latest/get-started/index.html) for full steps to configure and use ESP-IDF to build projects.
 
 ## Example Output
 
-The example should have log output similar to the following:
+Connect the `DI` signal of WS2812 LED strip to the GPIO you set in menuconfig.
 
-```
-W (34) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.
-I (37) example: App started!
-```
+Run the example, you will see a rainbow chasing demonstration effect. To change the chasing speed, you can update the `EXAMPLE_CHASE_SPEED_MS` value in `led_strip_main.c` file.
 
-All early log output is disabled in order to save time (it's also possible to disable the ROM log output immediately after reset, see below.)
+## Troubleshooting
 
-Note that boot time reported in the log timestamp may vary depending on the chip target, chip revision, and eFuse configuration.
-
-## Applying To Your Own Project
-
-The file `sdkconfig.defaults` contains a range of setting which can be applied to any project in order for it to boot more rapidly.
-
-However, note that some of these settings may have tradeoffs - for example not all hardware may support all flash modes and speeds, some applications would prefer the reliability of checking the application on every boot rather than waiting for a crash and then checking the application, and some applications will use features such as Secure Boot which require additional overhead on boot.
-
-The `sdkconfig.defaults` file in this directory contains comments above each of the settings to optimize boot speed. To add the settings
-to your own project, either search for the setting name in `menuconfig` or exit `menuconfig` and then copy-paste the setting lines at the end of your project's `sdkconfig` file.
-
-## Additional Startup Speed
-
-Removing the default boot log output printed by the ROM can shave several milliseconds off the SoC boot time. The default configuration doesn't make this change, as it is done via eFuse the change is permanent.
-
-If you wish to make this change run `idf.py menuconfig`, navigate to "Boot ROM Behavior" and set the "Permanently change Boot ROM output" option.
+For any technical queries, please open an [issue] (https://github.com/espressif/esp-idf/issues) on GitHub. We will get back to you soon.
