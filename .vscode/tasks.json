@@ -9,12 +9,12 @@
     },
     "tasks": [
       {
+        "label": "taskStart-OpenOCD",
         "type": "shell",
-        "label": "Start-OpenOCD",
         "command": "${env:HomePath}\\.espressif\\tools\\openocd-esp32\\v0.11.0-esp32-20211220\\openocd-esp32\\bin\\openocd.exe",
         "args": [
           "-f",
-          "${workspaceFolder}/openocd/board_ft232h_esp32s2.cfg",
+          "${workspaceFolder}/openocd/board_ft232h_esp32.cfg",
           "-c",
           "tcl_port disabled",
           "-c",
@@ -42,6 +42,44 @@
           "kind": "build",
           "isDefault": true
         }
-      }
+      },
+
+      {
+        "label": "taskFlash",
+        "type": "shell",
+        "command": "${env:HomePath}\\.espressif\\tools\\openocd-esp32\\v0.11.0-esp32-20211220\\openocd-esp32\\bin\\openocd.exe",
+        "args": [
+          "-f",
+          "${workspaceFolder}/openocd/board_ft232h_esp32.cfg",
+          "-c",
+          "tcl_port disabled",
+          "-c",
+          "gdb_port 3333", 
+          "-c",
+          "telnet_port 4444",
+          "-c",
+          "program_esp ${command:cmake.buildDirectory}/gatt_server_demos.bin 0x10000 verify reset exit"
+        ],
+        "problemMatcher": {
+          "pattern": {
+            "regexp": "^(Info |Warn |Error):(.*)$",
+            "severity": 1,
+            "message": 2
+          },
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": "^Open On-Chip Debugger.*",
+            "endsPattern": ".*watchpoints.*"
+          }
+        },
+        "presentation": {
+          "reveal": "always"
+        },
+        "isBackground": true,
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        }
+      },
     ]
   }
