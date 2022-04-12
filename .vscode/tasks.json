@@ -2,84 +2,122 @@
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
     "version": "2.0.0",
-    "options": {
-      "env": {
-        "OPENOCD_SCRIPTS": "${env:HomePath}\\.espressif\\tools\\openocd-esp32\\v0.11.0-esp32-20211220\\openocd-esp32\\share\\openocd\\scripts"
-      }
-    },
     "tasks": [
-      {
-        "label": "taskStart-OpenOCD",
-        "type": "shell",
-        "command": "${env:HomePath}\\.espressif\\tools\\openocd-esp32\\v0.11.0-esp32-20211220\\openocd-esp32\\bin\\openocd.exe",
-        "args": [
-          "-f",
-          "${workspaceFolder}/openocd/board_ft232h_esp32.cfg",
-          "-c",
-          "tcl_port disabled",
-          "-c",
-          "gdb_port 3333", 
-          "-c",
-          "telnet_port 4444"
-        ],
-        "problemMatcher": {
-          "pattern": {
-            "regexp": "^(Info |Warn |Error):(.*)$",
-            "severity": 1,
-            "message": 2
-          },
-          "background": {
-            "activeOnStart": true,
-            "beginsPattern": "^Open On-Chip Debugger.*",
-            "endsPattern": ".*watchpoints.*"
-          }
+        {
+            "label": "Build Firmware",
+            "type": "shell",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "options": {
+                "cwd": "${workspaceRoot}",
+                "env": {
+                    "PATH": "${config:esp_dev_env_path}:${env:PATH}",
+                    "IDF_PATH": "${config:esp_idf_path}"
+                }
+            },
+            "command": "idf.py build",
+            "problemMatcher": [
+                "$gcc"
+            ]
         },
-        "presentation": {
-          "reveal": "always"
+        {
+            "label": "Clean Project",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}",
+                "env": {
+                    "PATH": "${config:esp_dev_env_path}:${env:PATH}",
+                    "IDF_PATH": "${config:esp_idf_path}"
+                }
+            },
+            "command": "idf.py fullclean",
+            "problemMatcher": []
         },
-        "isBackground": true,
-        "group": {
-          "kind": "build",
-          "isDefault": true
-        }
-      },
-
-      {
-        "label": "taskFlash",
-        "type": "shell",
-        "command": "${env:HomePath}\\.espressif\\tools\\openocd-esp32\\v0.11.0-esp32-20211220\\openocd-esp32\\bin\\openocd.exe",
-        "args": [
-          "-f",
-          "${workspaceFolder}/openocd/board_ft232h_esp32.cfg",
-          "-c",
-          "tcl_port disabled",
-          "-c",
-          "gdb_port 3333", 
-          "-c",
-          "telnet_port 4444",
-          "-c",
-          "program_esp ${command:cmake.buildDirectory}/gatt_server_demos.bin 0x10000 verify reset exit"
-        ],
-        "problemMatcher": {
-          "pattern": {
-            "regexp": "^(Info |Warn |Error):(.*)$",
-            "severity": 1,
-            "message": 2
-          },
-          "background": {
-            "activeOnStart": true,
-            "beginsPattern": "^Open On-Chip Debugger.*",
-            "endsPattern": ".*watchpoints.*"
-          }
+        {
+            "label": "Manually 'clean' the `build/` Directory",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}",
+                "env": {
+                    "PATH": "${config:esp_dev_env_path}:${env:PATH}",
+                    "IDF_PATH": "${config:esp_idf_path}"
+                }
+            },
+            "command": "rm -rf build/",
+            "problemMatcher": []
         },
-        "presentation": {
-          "reveal": "always"
+        {
+            "label": "Flash via ESP-Prog and OpenOCD",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}",
+                "env": {
+                    "PATH": "${config:esp_dev_env_path}:${env:PATH}",
+                    "IDF_PATH": "${config:esp_idf_path}"
+                }
+            },
+            "command": "openocd",
+            "args": [
+                "-f",
+                "${workspaceFolder}/openocd/board_ft232h_esp32.cfg",
+                "-c",
+                "program_esp ${workspaceFolder}/build/${config:esp_build_target_name}.bin 0x10000 verify reset exit"
+            ],
+            "problemMatcher": []
         },
-        "isBackground": true,
-        "group": {
-          "kind": "build",
-          "isDefault": true
-        }
-      },
+        {
+            "label": "Flash via Serial",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}",
+                "env": {
+                    "PATH": "${config:esp_dev_env_path}:${env:PATH}",
+                    "IDF_PATH": "${config:esp_idf_path}"
+                }
+            },
+            "command": "idf.py -p ${config:esp_device_port} -b ${config:esp_device_baud} flash",
+            "problemMatcher": []
+        },
+        {
+            "label": "Monitor Serial Output",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}",
+                "env": {
+                    "PATH": "${config:esp_dev_env_path}:${env:PATH}",
+                    "IDF_PATH": "${config:esp_idf_path}"
+                }
+            },
+            "command": "idf.py -p ${config:esp_device_port} -b ${config:esp_device_baud} monitor",
+            "problemMatcher": []
+        },
+        {
+            "label": "Flash via Serial and Monitor Serial Output",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}",
+                "env": {
+                    "PATH": "${config:esp_dev_env_path}:${env:PATH}",
+                    "IDF_PATH": "${config:esp_idf_path}"
+                }
+            },
+            "command": "idf.py -p ${config:esp_device_port} -b ${config:esp_device_baud} flash monitor",
+            "problemMatcher": []
+        },
+        {
+            "label": "Open ESP-IDF Menu Config",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}",
+                "env": {
+                    "PATH": "${config:esp_dev_env_path}:${env:PATH}",
+                    "IDF_PATH": "${config:esp_idf_path}"
+                }
+            },
+            "command": "idf.py menuconfig",
+            "problemMatcher": []
+        },
     ]
-  }
+}
